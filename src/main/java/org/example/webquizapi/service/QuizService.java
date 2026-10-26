@@ -32,6 +32,16 @@ public class QuizService {
                 .toList();
     }
 
+    public List<QuizDto> getByAuthor(String email) {
+        AppUser user = appUserRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        return quizRepository.findByCreator(user)
+                .stream()
+                .map(quizMapper::entityToDto)
+                .toList();
+    }
+
     public QuizDto save(QuizDto dto) {
         Quiz quiz = quizMapper.dtoToEntity(dto);
         AppUser user = appUserRepository.findByEmail(dto.getAuthor())

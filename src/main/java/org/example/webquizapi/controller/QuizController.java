@@ -22,6 +22,15 @@ public class QuizController {
         this.quizService = quizService;
     }
 
+    @GetMapping
+    public List<QuizResponse> getQuizzesByAuthor(@AuthenticationPrincipal AppUserAdapter appUserAdapter) {
+        return quizService.getByAuthor(appUserAdapter.getUsername())
+                .stream()
+                .map(q -> new QuizResponse(q.getId(), q.getTitle(), q.getText(), q.getAuthor(), q.getOptions(), q.getAnswer()))
+                .toList();
+    }
+
+
     @GetMapping("/all")
     public List<QuizResponse> getAllQuizzes() {
         return quizService.getAll()
