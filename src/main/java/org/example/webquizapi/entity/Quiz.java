@@ -12,7 +12,6 @@ public class Quiz {
     private Long id;
     private String title;
     private String text;
-    private String author;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> options;
@@ -24,17 +23,16 @@ public class Quiz {
     @JoinColumn(name = "app_user_id", nullable = false)
     private AppUser creator;
 
-    @OneToMany(mappedBy = "test")
+    @OneToMany(mappedBy = "quiz")
     private List<Completion> completions = new ArrayList<>();
 
     public Quiz() {
     }
 
-    public Quiz(Long id, String title, String text, String author, List<String> options, List<Integer> answer) {
+    public Quiz(Long id, String title, String text, List<String> options, List<Integer> answer) {
         this.id = id;
         this.title = title;
         this.text = text;
-        this.author = author;
         this.options = options;
         this.answer = answer;
     }
@@ -63,14 +61,6 @@ public class Quiz {
         this.text = text;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public List<String> getOptions() {
         return options;
     }
@@ -85,5 +75,21 @@ public class Quiz {
 
     public void setAnswer(List<Integer> answer) {
         this.answer = answer;
+    }
+
+    public AppUser getCreator() {
+        return creator;
+    }
+
+    public void setCreator(AppUser creator) {
+        this.creator = creator;
+    }
+
+    public List<Completion> getCompletions() {
+        return completions;
+    }
+
+    public void setCompletions(List<Completion> completions) {
+        this.completions = completions;
     }
 }
