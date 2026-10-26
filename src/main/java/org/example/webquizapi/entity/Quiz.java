@@ -2,6 +2,7 @@ package org.example.webquizapi.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,13 @@ public class Quiz {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> answer;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "app_user_id", nullable = false)
+    private AppUser creator;
+
+    @OneToMany(mappedBy = "test")
+    private List<Completion> completions = new ArrayList<>();
 
     public Quiz() {
     }

@@ -1,8 +1,9 @@
 package org.example.webquizapi.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class AppUser {
@@ -11,6 +12,12 @@ public class AppUser {
     private Integer id;
     private String email;
     private String password;
+
+    @OneToMany(mappedBy = "creator")
+    private List<Quiz> createdTests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "appUser")
+    private List<Completion> completions = new ArrayList<>();
 
     public AppUser() {
     }
