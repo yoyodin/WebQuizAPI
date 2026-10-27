@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public class QuizContracts {
@@ -18,4 +19,12 @@ public class QuizContracts {
                                String author,
                                List<String> options,
                                List<Integer> answer) {}
+
+    public record SolveQuizRequest(List<Integer> answer) {}
+
+    public record SolveQuizResponse(boolean solved,
+                                    String feedback) { }
+
+    public record CompletionResponse(Long testId,
+                                     OffsetDateTime completedAt) {}
 }

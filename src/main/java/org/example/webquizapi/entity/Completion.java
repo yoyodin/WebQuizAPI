@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"app_user_id", "quiz_id"}))
 public class Completion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

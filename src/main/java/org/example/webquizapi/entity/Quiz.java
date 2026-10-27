@@ -92,4 +92,14 @@ public class Quiz {
     public void setCompletions(List<Completion> completions) {
         this.completions = completions;
     }
+
+    public void addCompletion(Completion completion) {
+        completions.add(completion);
+        completion.setQuiz(this);
+    }
+
+    public void removeCompletion(Completion completion) {
+        completions.remove(completion);
+        completion.setQuiz(null);
+    }
 }
