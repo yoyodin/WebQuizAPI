@@ -23,43 +23,50 @@ public class QuizController {
     }
 
     @GetMapping
-    public List<QuizResponse> getQuizzesByAuthor(@AuthenticationPrincipal AppUserAdapter appUserAdapter) {
-        return quizService.getByAuthor(appUserAdapter.getUsername())
+    public ResponseEntity<List<QuizResponse>> getQuizzesByAuthor(@AuthenticationPrincipal AppUserAdapter appUserAdapter) {
+        List<QuizResponse> quizzes = quizService.getByAuthor(appUserAdapter.getUsername())
                 .stream()
                 .map(q -> new QuizResponse(q.getId(), q.getTitle(), q.getText(), q.getAuthor(), q.getOptions(), q.getAnswer()))
                 .toList();
+
+        return ResponseEntity.ok(quizzes);
     }
 
     @GetMapping("/solved")
-    public Page<CompletionResponse> getSolvedByAuthor(@RequestParam int page,
+    public ResponseEntity<Page<CompletionResponse>> getSolvedByAuthor(@RequestParam int page,
                                                       @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
-        return quizService.getSolvedQuizzesByUser(appUserAdapter.getUsername(), page)
+        Page<CompletionResponse> quizzes = quizService.getSolvedQuizzesByUser(appUserAdapter.getUsername(), page)
                 .map(c -> new CompletionResponse(c.getTestId(), c.getCompletedAt()));
+
+        return ResponseEntity.ok(quizzes);
     }
 
     @GetMapping("/all")
-    public List<QuizResponse> getAllQuizzes() {
-        return quizService.getAll()
+    public ResponseEntity<List<QuizResponse>> getAllQuizzes() {
+        List<QuizResponse> quizzes =  quizService.getAll()
                 .stream()
                 .map(q -> new QuizResponse(q.getId(), q.getTitle(), q.getText(), q.getAuthor(), q.getOptions(), q.getAnswer()))
                 .toList();
+
+        return ResponseEntity.ok(quizzes);
     }
 
     @PostMapping
-    public ResponseEntity<?> createQuiz(@Valid @RequestBody CreateQuizRequest quizRequest,
+    public ResponseEntity<QuizDto> createQuiz(@Valid @RequestBody CreateQuizRequest quizRequest,
                                         @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         QuizDto dto = new QuizDto(null, quizRequest.title(), quizRequest.text(), quizRequest.options(), quizRequest.answer(), appUserAdapter.getUsername());
         dto = quizService.save(dto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}/solve")
-    public SolveQuizResponse solveQuiz(@PathVariable int id,
+    public ResponseEntity<SolveQuizResponse> solveQuiz(@PathVariable int id,
                                        @RequestBody SolveQuizRequest solveQuizRequest,
                                        @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         boolean solved = quizService.solveQuiz(id, solveQuizRequest.answer(), appUserAdapter.getUsername());
         String feedback = solved ? "Congratulations, you're right!" : "Wrong answer! Please, try again.";
-        return new SolveQuizResponse(solved, feedback);
+
+        return ResponseEntity.ok(new SolveQuizResponse(solved, feedback));
     }
 }

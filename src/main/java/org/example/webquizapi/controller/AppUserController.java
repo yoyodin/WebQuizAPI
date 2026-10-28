@@ -20,19 +20,21 @@ public class AppUserController {
     }
 
     @GetMapping
-    public List<GetUserResponse> getUsers() {
-        return appUserService.getAllUsers()
+    public ResponseEntity<List<GetUserResponse>> getUsers() {
+        List<GetUserResponse> users = appUserService.getAllUsers()
                 .stream()
                 .map(u -> new GetUserResponse(u.getId(), u.getEmail()))
                 .toList();
+
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
+    public ResponseEntity<AppUserDto> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
         AppUserDto dto = new AppUserDto(null, userRequest.email(), userRequest.password());
         dto = appUserService.save(dto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
