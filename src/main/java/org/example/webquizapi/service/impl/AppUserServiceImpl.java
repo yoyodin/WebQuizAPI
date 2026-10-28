@@ -1,9 +1,10 @@
-package org.example.webquizapi.service;
+package org.example.webquizapi.service.impl;
 
 import org.example.webquizapi.dto.AppUserDto;
 import org.example.webquizapi.entity.AppUser;
 import org.example.webquizapi.mapper.AppUserMapper;
 import org.example.webquizapi.repository.AppUserRepository;
+import org.example.webquizapi.service.AppUserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

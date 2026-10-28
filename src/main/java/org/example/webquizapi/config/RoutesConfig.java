@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 @PropertySource("classpath:routes.properties")
 public class RoutesConfig {
-    public static final String API_URI = "${api.root}/${api.version}";
+    public static final String API_URI          = "${api.root}/${api.version}";
 
     // AppUser routes
     public static final String APP_USER_ROOT    = API_URI + "${user.root}";

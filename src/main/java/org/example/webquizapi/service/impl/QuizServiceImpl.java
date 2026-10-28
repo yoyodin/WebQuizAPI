@@ -1,4 +1,4 @@
-package org.example.webquizapi.service;
+package org.example.webquizapi.service.impl;
 
 import org.example.webquizapi.dto.CompletionDto;
 import org.example.webquizapi.dto.QuizDto;
@@ -11,6 +11,7 @@ import org.example.webquizapi.mapper.QuizMapper;
 import org.example.webquizapi.repository.AppUserRepository;
 import org.example.webquizapi.repository.CompletionRepository;
 import org.example.webquizapi.repository.QuizRepository;
+import org.example.webquizapi.service.QuizService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
