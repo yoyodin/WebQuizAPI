@@ -53,6 +53,13 @@ public class QuizService {
                 .toList();
     }
 
+    public QuizDto getById(Long id) {
+        Quiz quiz = quizRepository.findById(id)
+                .orElseThrow(QuizNotFoundException::new);
+
+        return quizMapper.entityToDto(quiz);
+    }
+
     public QuizDto save(QuizDto dto) {
         Quiz quiz = quizMapper.dtoToEntity(dto);
         AppUser user = appUserRepository.findByEmail(dto.getAuthor())
@@ -65,7 +72,7 @@ public class QuizService {
     }
 
     public boolean solveQuiz(int id, List<Integer> answer, String email) {
-        Quiz quiz = quizRepository.findById((long)id)
+        Quiz quiz = quizRepository.findById((long) id)
                 .orElseThrow(QuizNotFoundException::new);
 
         if (answer.containsAll(quiz.getAnswer())) {

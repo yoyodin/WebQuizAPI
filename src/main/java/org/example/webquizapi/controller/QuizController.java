@@ -32,9 +32,14 @@ public class QuizController {
         return ResponseEntity.ok(quizzes);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<QuizDto> getQuizById(@PathVariable Long id) {
+        return ResponseEntity.ok(quizService.getById(id));
+    }
+
     @GetMapping("/solved")
     public ResponseEntity<Page<CompletionResponse>> getSolvedByAuthor(@RequestParam int page,
-                                                      @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
+                                                                      @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         Page<CompletionResponse> quizzes = quizService.getSolvedQuizzesByUser(appUserAdapter.getUsername(), page)
                 .map(c -> new CompletionResponse(c.getTestId(), c.getCompletedAt()));
 
@@ -43,7 +48,7 @@ public class QuizController {
 
     @GetMapping("/all")
     public ResponseEntity<List<QuizResponse>> getAllQuizzes() {
-        List<QuizResponse> quizzes =  quizService.getAll()
+        List<QuizResponse> quizzes = quizService.getAll()
                 .stream()
                 .map(q -> new QuizResponse(q.getId(), q.getTitle(), q.getText(), q.getAuthor(), q.getOptions(), q.getAnswer()))
                 .toList();
@@ -53,7 +58,7 @@ public class QuizController {
 
     @PostMapping
     public ResponseEntity<QuizDto> createQuiz(@Valid @RequestBody CreateQuizRequest quizRequest,
-                                        @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
+                                              @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         QuizDto dto = new QuizDto(null, quizRequest.title(), quizRequest.text(), quizRequest.options(), quizRequest.answer(), appUserAdapter.getUsername());
         dto = quizService.save(dto);
 
@@ -62,8 +67,8 @@ public class QuizController {
 
     @PostMapping("/{id}/solve")
     public ResponseEntity<SolveQuizResponse> solveQuiz(@PathVariable int id,
-                                       @RequestBody SolveQuizRequest solveQuizRequest,
-                                       @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
+                                                       @RequestBody SolveQuizRequest solveQuizRequest,
+                                                       @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         boolean solved = quizService.solveQuiz(id, solveQuizRequest.answer(), appUserAdapter.getUsername());
         String feedback = solved ? "Congratulations, you're right!" : "Wrong answer! Please, try again.";
 
