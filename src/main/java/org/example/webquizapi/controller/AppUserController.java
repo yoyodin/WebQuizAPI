@@ -1,9 +1,11 @@
 package org.example.webquizapi.controller;
 
 import jakarta.validation.Valid;
+import org.example.webquizapi.config.RoutesConfig;
+import org.example.webquizapi.contracts.UserContracts.CreateUserRequest;
+import org.example.webquizapi.contracts.UserContracts.GetUserResponse;
 import org.example.webquizapi.dto.AppUserDto;
-import org.example.webquizapi.contracts.UserContracts.*;
-import org.example.webquizapi.service.AppUserServiceImpl;
+import org.example.webquizapi.service.AppUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping(RoutesConfig.APP_USER_ROOT)
 public class AppUserController {
-    private final AppUserServiceImpl appUserService;
+    private final AppUserService appUserService;
 
-    public AppUserController(AppUserServiceImpl appUserService) {
+    public AppUserController(AppUserService appUserService) {
         this.appUserService = appUserService;
     }
 
@@ -29,7 +31,7 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/register")
+    @PostMapping(RoutesConfig.REGISTER)
     public ResponseEntity<AppUserDto> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
         AppUserDto dto = new AppUserDto(null, userRequest.email(), userRequest.password());
         dto = appUserService.save(dto);
