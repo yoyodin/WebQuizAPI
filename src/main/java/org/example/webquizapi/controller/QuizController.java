@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import org.example.webquizapi.contracts.QuizContracts.*;
 import org.example.webquizapi.dto.QuizDto;
 import org.example.webquizapi.security.AppUserAdapter;
-import org.example.webquizapi.service.QuizService;
+import org.example.webquizapi.service.QuizServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/quiz")
 public class QuizController {
-    private final QuizService quizService;
+    private final QuizServiceImpl quizService;
 
-    public QuizController(QuizService quizService) {
+    public QuizController(QuizServiceImpl quizService) {
         this.quizService = quizService;
     }
 

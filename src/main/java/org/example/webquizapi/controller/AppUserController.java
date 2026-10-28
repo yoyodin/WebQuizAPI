@@ -3,7 +3,7 @@ package org.example.webquizapi.controller;
 import jakarta.validation.Valid;
 import org.example.webquizapi.dto.AppUserDto;
 import org.example.webquizapi.contracts.UserContracts.*;
-import org.example.webquizapi.service.AppUserService;
+import org.example.webquizapi.service.AppUserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +13,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/user")
 public class AppUserController {
-    private final AppUserService appUserService;
+    private final AppUserServiceImpl appUserService;
 
-    public AppUserController(AppUserService appUserService) {
+    public AppUserController(AppUserServiceImpl appUserService) {
         this.appUserService = appUserService;
     }
 

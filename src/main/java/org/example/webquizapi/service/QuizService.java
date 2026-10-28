@@ -2,96 +2,20 @@ package org.example.webquizapi.service;
 
 import org.example.webquizapi.dto.CompletionDto;
 import org.example.webquizapi.dto.QuizDto;
-import org.example.webquizapi.entity.AppUser;
-import org.example.webquizapi.entity.Completion;
-import org.example.webquizapi.entity.Quiz;
-import org.example.webquizapi.exception.QuizNotFoundException;
-import org.example.webquizapi.exception.UserNotFoundException;
-import org.example.webquizapi.mapper.QuizMapper;
-import org.example.webquizapi.repository.AppUserRepository;
-import org.example.webquizapi.repository.CompletionRepository;
-import org.example.webquizapi.repository.QuizRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
-@Service
-public class QuizService {
-    private final QuizRepository quizRepository;
-    private final AppUserRepository appUserRepository;
-    private final CompletionRepository completionRepository;
-    private final QuizMapper quizMapper;
+public interface QuizService {
+    List<QuizDto> getAll();
 
-    public QuizService(QuizRepository quizRepository,
-                       AppUserRepository appUserRepository,
-                       CompletionRepository completionRepository,
-                       QuizMapper quizMapper) {
-        this.quizRepository = quizRepository;
-        this.appUserRepository = appUserRepository;
-        this.completionRepository = completionRepository;
-        this.quizMapper = quizMapper;
-    }
+    List<QuizDto> getByAuthor(String email);
 
-    public List<QuizDto> getAll() {
-        return quizRepository.findAll()
-                .stream()
-                .map(quizMapper::entityToDto)
-                .toList();
-    }
+    QuizDto getById(Long id);
 
-    public List<QuizDto> getByAuthor(String email) {
-        AppUser user = appUserRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+    QuizDto save(QuizDto dto);
 
-        return quizRepository.findByCreator(user)
-                .stream()
-                .map(quizMapper::entityToDto)
-                .toList();
-    }
+    boolean solveQuiz(int id, List<Integer> answer, String email);
 
-    public QuizDto getById(Long id) {
-        Quiz quiz = quizRepository.findById(id)
-                .orElseThrow(QuizNotFoundException::new);
-
-        return quizMapper.entityToDto(quiz);
-    }
-
-    public QuizDto save(QuizDto dto) {
-        Quiz quiz = quizMapper.dtoToEntity(dto);
-        AppUser user = appUserRepository.findByEmail(dto.getAuthor())
-                .orElseThrow(UserNotFoundException::new);
-
-        quiz.setCreator(user);
-        quiz = quizRepository.save(quiz);
-
-        return quizMapper.entityToDto(quiz);
-    }
-
-    public boolean solveQuiz(int id, List<Integer> answer, String email) {
-        Quiz quiz = quizRepository.findById((long) id)
-                .orElseThrow(QuizNotFoundException::new);
-
-        if (answer.containsAll(quiz.getAnswer())) {
-            AppUser user = appUserRepository.findByEmail(email)
-                    .orElseThrow(UserNotFoundException::new);
-
-            Completion completed = new Completion(null, user, quiz, OffsetDateTime.now());
-            completionRepository.save(completed);
-
-            quiz.addCompletion(completed);
-            quizRepository.save(quiz);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public Page<CompletionDto> getSolvedQuizzesByUser(String email, int pageNumber) {
-        return completionRepository.findByEmail(email, PageRequest.of(pageNumber, 10, Sort.by("completedAt").descending()));
-    }
+    Page<CompletionDto> getSolvedQuizzesByUser(String email, int pageNumber);
 }
