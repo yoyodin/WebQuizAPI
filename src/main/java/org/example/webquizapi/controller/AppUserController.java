@@ -5,9 +5,13 @@ import org.example.webquizapi.config.RoutesConfig;
 import org.example.webquizapi.contracts.UserContracts.CreateUserRequest;
 import org.example.webquizapi.contracts.UserContracts.GetUserResponse;
 import org.example.webquizapi.dto.AppUserDto;
+import org.example.webquizapi.security.AppUserAdapter;
 import org.example.webquizapi.service.AppUserService;
+import org.example.webquizapi.service.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +20,11 @@ import java.util.List;
 @RequestMapping(RoutesConfig.APP_USER_ROOT)
 public class AppUserController {
     private final AppUserService appUserService;
+    private final TokenService tokenService;
 
-    public AppUserController(AppUserService appUserService) {
+    public AppUserController(AppUserService appUserService, TokenService tokenService) {
         this.appUserService = appUserService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping
@@ -39,5 +45,8 @@ public class AppUserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
+    @PostMapping("/token")
+    public String token(Authentication authentication) {
+        return tokenService.generateToken(authentication);
+    }
 }
