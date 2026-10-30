@@ -11,6 +11,7 @@ public class RoutesConfig {
     // AppUser routes
     public static final String APP_USER_ROOT    = API_URI + "${user.root}";
     public static final String REGISTER         = "${user.register}";
+    public static final String TOKEN            = "${user.token}";
 
     // Quiz routes
     public static final String QUIZ_ROOT        = API_URI + "${quiz.root}";
