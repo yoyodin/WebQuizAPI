@@ -1,7 +1,6 @@
 package org.example.webquizapi.controller;
 
 import jakarta.validation.Valid;
-import org.example.webquizapi.config.RoutesConfig;
 import org.example.webquizapi.contracts.QuizContracts.*;
 import org.example.webquizapi.dto.QuizDto;
 import org.example.webquizapi.security.AppUserAdapter;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(RoutesConfig.QUIZ_ROOT)
+@RequestMapping("/api/v1/quiz")
 public class QuizController {
     private final QuizService quizService;
 
@@ -33,7 +32,7 @@ public class QuizController {
         return ResponseEntity.ok(quizzes);
     }
 
-    @GetMapping(RoutesConfig.ALL_QUIZZES)
+    @GetMapping("/all")
     public ResponseEntity<List<QuizResponse>> getAllQuizzes() {
         List<QuizResponse> quizzes = quizService.getAll()
                 .stream()
@@ -43,12 +42,12 @@ public class QuizController {
         return ResponseEntity.ok(quizzes);
     }
 
-    @GetMapping(RoutesConfig.QUIZ_BY_ID)
+    @GetMapping("/{id}")
     public ResponseEntity<QuizDto> getQuizById(@PathVariable Long id) {
         return ResponseEntity.ok(quizService.getById(id));
     }
 
-    @GetMapping(RoutesConfig.SOLVED_QUIZZES)
+    @GetMapping("/solved")
     public ResponseEntity<Page<CompletionResponse>> getSolvedByAuthor(@RequestParam int page,
                                                                       @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
         Page<CompletionResponse> quizzes = quizService.getSolvedQuizzesByUser(appUserAdapter.getUsername(), page)
@@ -66,7 +65,7 @@ public class QuizController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(RoutesConfig.SOLVE_BY_ID)
+    @PostMapping("/{id}/solve")
     public ResponseEntity<SolveQuizResponse> solveQuiz(@PathVariable int id,
                                                        @RequestBody SolveQuizRequest solveQuizRequest,
                                                        @AuthenticationPrincipal AppUserAdapter appUserAdapter) {
