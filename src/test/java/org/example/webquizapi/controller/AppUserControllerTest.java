@@ -40,7 +40,7 @@ public class AppUserControllerTest {
         when(appUserService.getAllUsers()).thenReturn(mockUserResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user")
-                        .with(user("javo@gmail.com")))
+                        .with(user("test@test.com")))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -95,12 +95,12 @@ public class AppUserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /token returns 200 OK and a string")
+    @DisplayName("POST /token returns 200 OK")
     void token_returnsValidResponseEntity() throws Exception {
         when(tokenService.generateToken(null)).thenReturn("token");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/token")
-                .with(user("javo@gmail.com")))
+                .with(user("test@test.com")))
                 .andExpectAll(status().isOk());
     }
 }

@@ -1,7 +1,6 @@
 package org.example.webquizapi.controller;
 
 import jakarta.validation.Valid;
-import org.example.webquizapi.config.RoutesConfig;
 import org.example.webquizapi.contracts.UserContracts.CreateUserRequest;
 import org.example.webquizapi.contracts.UserContracts.GetUserResponse;
 import org.example.webquizapi.dto.AppUserDto;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(RoutesConfig.APP_USER_ROOT)
+@RequestMapping("/api/v1/user")
 public class AppUserController {
     private final AppUserService appUserService;
     private final TokenService tokenService;
@@ -35,7 +34,7 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping(RoutesConfig.REGISTER)
+    @PostMapping("/register")
     public ResponseEntity<AppUserDto> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
         AppUserDto dto = new AppUserDto(null, userRequest.email(), userRequest.password());
         dto = appUserService.save(dto);
@@ -43,7 +42,7 @@ public class AppUserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(RoutesConfig.TOKEN)
+    @PostMapping("/token")
     public String token(Authentication authentication) {
         return tokenService.generateToken(authentication);
     }
