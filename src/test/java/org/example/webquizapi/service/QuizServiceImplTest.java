@@ -53,7 +53,7 @@ public class QuizServiceImplTest {
     @Test
     void getAll_shouldReturnQuizDtoList() {
         when(quizRepository.findAll()).thenReturn(List.of(mockQuiz));
-        when(quizMapper.entityToDto(any())).thenReturn(mockQuizDto);
+        when(quizMapper.entityToDto(any(Quiz.class))).thenReturn(mockQuizDto);
 
         var quizzes = quizService.getAll();
 
@@ -65,25 +65,25 @@ public class QuizServiceImplTest {
 
     @Test
     void getByAuthor_shouldReturnQuizDtoList() {
-        when(appUserRepository.findByEmail(any())).thenReturn(Optional.of(mockAppUser));
-        when(quizRepository.findByCreator(any())).thenReturn(List.of(mockQuiz));
-        when(quizMapper.entityToDto(any())).thenReturn(mockQuizDto);
+        when(appUserRepository.findByEmail(anyString())).thenReturn(Optional.of(mockAppUser));
+        when(quizRepository.findByCreator(any(AppUser.class))).thenReturn(List.of(mockQuiz));
+        when(quizMapper.entityToDto(any(Quiz.class))).thenReturn(mockQuizDto);
 
         var quizzes = quizService.getByAuthor("test@test.com");
 
         assertThat(quizzes.getFirst().getId()).isEqualTo(mockQuizDto.getId());
 
-        verify(appUserRepository).findByEmail(any());
+        verify(appUserRepository).findByEmail(anyString());
         verify(quizRepository).findByCreator(any());
         verify(quizMapper).entityToDto(any());
     }
 
     @Test
     void getByAuthor_shouldThrowException() {
-        when(appUserRepository.findByEmail(any()))
+        when(appUserRepository.findByEmail(anyString()))
                 .thenThrow(UserNotFoundException.class);
 
-        assertThatThrownBy(() -> quizService.getByAuthor(any()))
+        assertThatThrownBy(() -> quizService.getByAuthor(anyString()))
                 .isInstanceOf(UserNotFoundException.class);
 
         verify(quizRepository, never()).findByCreator(any());
@@ -92,8 +92,8 @@ public class QuizServiceImplTest {
 
     @Test
     void getById_shouldReturnQuizDto() {
-        when(quizRepository.findById(any())).thenReturn(Optional.of(mockQuiz));
-        when(quizMapper.entityToDto(any())).thenReturn(mockQuizDto);
+        when(quizRepository.findById(anyLong())).thenReturn(Optional.of(mockQuiz));
+        when(quizMapper.entityToDto(any(Quiz.class))).thenReturn(mockQuizDto);
 
         var quizDto = quizService.getById(1L);
 
@@ -105,10 +105,10 @@ public class QuizServiceImplTest {
 
     @Test
     void getById_shouldThrowException() {
-        when(quizRepository.findById(any()))
+        when(quizRepository.findById(anyLong()))
                 .thenThrow(QuizNotFoundException.class);
 
-        assertThatThrownBy(() -> quizService.getById(any()))
+        assertThatThrownBy(() -> quizService.getById(anyLong()))
                 .isInstanceOf(QuizNotFoundException.class);
 
         verify(quizMapper, never()).entityToDto(any());
@@ -117,7 +117,7 @@ public class QuizServiceImplTest {
     @Test
     void save_shouldReturnQuizDto() {
         when(quizMapper.dtoToEntity(any(QuizDto.class))).thenReturn(mockQuiz);
-        when(appUserRepository.findByEmail(any(String.class))).thenReturn(Optional.of(mockAppUser));
+        when(appUserRepository.findByEmail(anyString())).thenReturn(Optional.of(mockAppUser));
         when(quizRepository.save(any(Quiz.class))).thenReturn(mockQuiz);
         when(quizMapper.entityToDto(any(Quiz.class))).thenReturn(mockQuizDto);
 
@@ -133,21 +133,21 @@ public class QuizServiceImplTest {
 
     @Test
     void solveQuiz_shouldReturnFalse() {
-        when(quizRepository.findById(any(Long.class))).thenReturn(Optional.of(mockQuiz));
+        when(quizRepository.findById(anyLong())).thenReturn(Optional.of(mockQuiz));
 
         boolean solve = quizService.solveQuiz(1, List.of(3), "test@test.com");
 
         assertThat(solve).isFalse();
 
-        verify(appUserRepository, never()).findByEmail(any());
+        verify(appUserRepository, never()).findByEmail(anyString());
         verify(completionRepository, never()).save(any());
         verify(quizRepository, never()).save(any());
     }
 
     @Test
     void solveQuiz_shouldReturnTrue() {
-        when(quizRepository.findById(any(Long.class))).thenReturn(Optional.of(mockQuiz));
-        when(appUserRepository.findByEmail(any(String.class))).thenReturn(Optional.of(mockAppUser));
+        when(quizRepository.findById(anyLong())).thenReturn(Optional.of(mockQuiz));
+        when(appUserRepository.findByEmail(anyString())).thenReturn(Optional.of(mockAppUser));
         when(completionRepository.save(any(Completion.class))).thenReturn(new Completion(1L, mockAppUser, mockQuiz, OffsetDateTime.now()));
         when(quizRepository.save(any(Quiz.class))).thenReturn(mockQuiz);
 
@@ -155,8 +155,8 @@ public class QuizServiceImplTest {
 
         assertThat(solve).isTrue();
 
-        verify(quizRepository).findById(any());
-        verify(appUserRepository).findByEmail(any());
+        verify(quizRepository).findById(anyLong());
+        verify(appUserRepository).findByEmail(anyString());
         verify(completionRepository).save(any());
         verify(quizRepository).save(any());
     }
@@ -164,15 +164,15 @@ public class QuizServiceImplTest {
     @Test
     void getSolvedQuizzes_shouldReturnPage() {
         OffsetDateTime completedAt = OffsetDateTime.parse("2026-10-25T14:30:15.123+01:00");
-        Page<CompletionDto> p = new PageImpl<>(List.of(new CompletionDto(1L, completedAt)));
+        Page<CompletionDto> completionPage = new PageImpl<>(List.of(new CompletionDto(1L, completedAt)));
 
-        when(completionRepository.findByEmail(any(String.class), any(Pageable.class))).thenReturn(p);
+        when(completionRepository.findByEmail(anyString(), any(Pageable.class))).thenReturn(completionPage);
 
         var page = quizService.getSolvedQuizzesByUser("test@test.com", 0);
 
         assertThat(page.hasContent()).isTrue();
         assertThat(page.getContent().getFirst().getCompletedAt()).isEqualTo(completedAt);
 
-        verify(completionRepository).findByEmail(any(), any());
+        verify(completionRepository).findByEmail(anyString(), any());
     }
 }

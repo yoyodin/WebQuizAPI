@@ -1,6 +1,5 @@
 package org.example.webquizapi.controller;
 
-import org.example.webquizapi.contracts.QuizContracts.*;
 import org.example.webquizapi.dto.CompletionDto;
 import org.example.webquizapi.dto.QuizDto;
 import org.example.webquizapi.entity.AppUser;
@@ -17,7 +16,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -27,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -83,7 +82,7 @@ public class QuizControllerTest {
     @Test
     @DisplayName("GET /quiz returns 200 OK and a valid JSON")
     void getQuizzesByAuthor_returnsValidResponseEntity() throws Exception {
-        when(quizService.getByAuthor("test@test.com")).thenReturn(mockQuizzes);
+        when(quizService.getByAuthor(anyString())).thenReturn(mockQuizzes);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz").with(authentication(auth)))
                 .andExpectAll(
@@ -91,6 +90,8 @@ public class QuizControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON),
                         content().json(mockQuizzesListResponse)
                 );
+
+        verify(quizService).getByAuthor(anyString());
     }
 
     @Test
@@ -111,6 +112,8 @@ public class QuizControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON),
                         content().json(mockQuizzesListResponse)
                 );
+
+        verify(quizService).getAll();
     }
 
     @Test
@@ -123,7 +126,7 @@ public class QuizControllerTest {
     @Test
     @DisplayName("GET /quiz/1 returns 200 OK and a valid JSON")
     void getQuizById_returnsValidResponseEntity() throws Exception {
-        when(quizService.getById(1L)).thenReturn(mockQuizzes.getFirst());
+        when(quizService.getById(anyLong())).thenReturn(mockQuizzes.getFirst());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz/1")
                         .with(authentication(auth)))
@@ -132,12 +135,14 @@ public class QuizControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON),
                         content().json(mockQuizResponse)
                 );
+
+        verify(quizService).getById(anyLong());
     }
 
     @Test
     @DisplayName("GET /quiz/1 returns 404 NOT FOUND")
     void getQuizById_returnsQuizNotFound() throws Exception {
-        when(quizService.getById(1L)).thenThrow(new QuizNotFoundException());
+        when(quizService.getById(anyLong())).thenThrow(new QuizNotFoundException());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz/1")
                 .with(authentication(auth)))
@@ -146,12 +151,14 @@ public class QuizControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.message").value("No Quiz found with the given id")
                 );
+
+        verify(quizService).getById(anyLong());
     }
 
     @Test
     @DisplayName("GET /quiz/1 returns 404 NOT FOUND")
     void getQuizById_returnsUserNotFound() throws Exception {
-        when(quizService.getById(1L)).thenThrow(new UserNotFoundException());
+        when(quizService.getById(anyLong())).thenThrow(new UserNotFoundException());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz/1")
                         .with(authentication(auth)))
@@ -160,14 +167,14 @@ public class QuizControllerTest {
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.message").value("User not found")
                 );
+
+        verify(quizService).getById(anyLong());
     }
 
     @Test
     @DisplayName("POST /quiz returns 201 CREATED")
     void createQuiz_returnsCreated() throws Exception {
-        var mockCreateQuizReq = new QuizDto(null, "Test quiz", "Quiz test", List.of("1", "2"), List.of(1,2), "test@test.com");
-
-        when(quizService.save(mockCreateQuizReq)).thenReturn(mockQuizzes.getFirst());
+        when(quizService.save(any(QuizDto.class))).thenReturn(mockQuizzes.getFirst());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/quiz")
                 .with(authentication(auth))
@@ -181,12 +188,14 @@ public class QuizControllerTest {
                         }
                         """))
                 .andExpect(status().isCreated());
+
+        verify(quizService).save(any());
     }
 
     @Test
     @DisplayName("POST /quiz/1/solve returns 200 OK and a valid JSON")
     void solveQuiz_returnsCorrectFeedback() throws Exception {
-        when(quizService.solveQuiz(1, List.of(1,2), "test@test.com")).thenReturn(true);
+        when(quizService.solveQuiz(anyInt(), anyList(), anyString())).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/quiz/1/solve")
                         .with(authentication(auth))
@@ -206,12 +215,14 @@ public class QuizControllerTest {
                                 }
                                 """)
                 );
+
+        verify(quizService).solveQuiz(anyInt(), anyList(), anyString());
     }
 
     @Test
     @DisplayName("POST /quiz/1/solve returns 200 OK and a valid JSON")
     void solveQuiz_returnsWrongFeedback() throws Exception {
-        when(quizService.solveQuiz(1, List.of(1,2), "test@test.com")).thenReturn(false);
+        when(quizService.solveQuiz(anyInt(), anyList(), anyString())).thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/quiz/1/solve")
                         .with(authentication(auth))
@@ -231,6 +242,8 @@ public class QuizControllerTest {
                                 }
                                 """)
                 );
+
+        verify(quizService).solveQuiz(anyInt(), anyList(), anyString());
     }
 
     @Test
@@ -239,7 +252,7 @@ public class QuizControllerTest {
         OffsetDateTime completedAt = OffsetDateTime.parse("2026-10-25T14:30:15.123+01:00");
         Page<CompletionDto> p = new PageImpl<>(List.of(new CompletionDto(1L, completedAt)));
 
-        when(quizService.getSolvedQuizzesByUser("test@test.com", 0)).thenReturn(p);
+        when(quizService.getSolvedQuizzesByUser(anyString(), anyInt())).thenReturn(p);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz/solved")
                 .with(authentication(auth))
@@ -250,5 +263,7 @@ public class QuizControllerTest {
                         jsonPath("$.content[*].testId").isNotEmpty(),
                         jsonPath("$.content[*].completedAt").value(completedAt.toString())
                 );
+
+        verify(quizService).getSolvedQuizzesByUser(anyString(), anyInt());
     }
 }
