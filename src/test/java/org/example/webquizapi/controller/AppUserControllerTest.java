@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -53,6 +56,8 @@ public class AppUserControllerTest {
                                 ]
                                 """)
                 );
+
+        verify(appUserService).getAllUsers();
     }
 
     @Test
@@ -65,7 +70,7 @@ public class AppUserControllerTest {
     @Test
     @DisplayName("POST /register returns 201 CREATED")
     void register_returnsValidResponseEntity() throws Exception {
-        when(appUserService.save(null)).thenReturn(null);
+        when(appUserService.save(any(AppUserDto.class))).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,12 +81,14 @@ public class AppUserControllerTest {
                                 }
                                 """))
                 .andExpect(status().isCreated());
+
+        verify(appUserService).save(any());
     }
 
     @Test
     @DisplayName("POST /register returns 500 INTERNAL SERVER ERROR")
     void register_returnsInternalServerErrorEmptyPassword() throws Exception {
-        when(appUserService.save(null)).thenReturn(null);
+        when(appUserService.save(any(AppUserDto.class))).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,10 +104,12 @@ public class AppUserControllerTest {
     @Test
     @DisplayName("POST /token returns 200 OK")
     void token_returnsValidResponseEntity() throws Exception {
-        when(tokenService.generateToken(null)).thenReturn("token");
+        when(tokenService.generateToken(any(Authentication.class))).thenReturn("token");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/token")
                 .with(user("test@test.com")))
                 .andExpectAll(status().isOk());
+
+        verify(tokenService).generateToken(any());
     }
 }
