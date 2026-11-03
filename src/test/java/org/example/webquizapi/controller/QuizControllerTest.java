@@ -1,6 +1,7 @@
 package org.example.webquizapi.controller;
 
 import org.example.webquizapi.contracts.QuizContracts.*;
+import org.example.webquizapi.dto.CompletionDto;
 import org.example.webquizapi.dto.QuizDto;
 import org.example.webquizapi.entity.AppUser;
 import org.example.webquizapi.exception.QuizNotFoundException;
@@ -14,14 +15,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -224,6 +230,25 @@ public class QuizControllerTest {
                                     "feedback": "Wrong answer! Please, try again."
                                 }
                                 """)
+                );
+    }
+
+    @Test
+    @DisplayName("GET /quiz/solved returns 200 OK and a valid JSON")
+    void getSolvedByAuthor_returnsSolvedQuizzes() throws Exception {
+        OffsetDateTime completedAt = OffsetDateTime.parse("2026-10-25T14:30:15.123+01:00");
+        Page<CompletionDto> p = new PageImpl<>(List.of(new CompletionDto(1L, completedAt)));
+
+        when(quizService.getSolvedQuizzesByUser("test@test.com", 0)).thenReturn(p);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/quiz/solved")
+                .with(authentication(auth))
+                .param("page", "0"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.content[*].testId").isNotEmpty(),
+                        jsonPath("$.content[*].completedAt").value(completedAt.toString())
                 );
     }
 }
