@@ -1,6 +1,5 @@
 package org.example.webquizapi.service.impl;
 
-import org.example.webquizapi.security.AppUserAdapter;
 import org.example.webquizapi.service.TokenService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
